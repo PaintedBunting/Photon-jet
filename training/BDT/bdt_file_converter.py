@@ -52,7 +52,6 @@ def get_x(myindex,ybin,zbin):
     pass
 
 
-#def sendhelp(inname = "axion1_100GeV_20k.root", output_prefix = "new"):
 inname = "gamma_100GeV_20k.root"
 output_prefix = "new"
 treename = "fancy_tree"
@@ -66,12 +65,6 @@ tout= TTree(treename,treename)
 sampling1 = TH2F("","",3,-240.,240.,480//5,-240.,240.)
 sampling2 = TH2F("","",480//40,-240.,240.,480//40,-240.,240.)
 sampling3 = TH2F("","",480//40,-240.,240.,480//80,-240.,240.)
-    
-#y = "energy"
-#exec("%s = %s" % (y,"tin.cell_0"))
-#print("initial energy is ",energy)
-
-#cells = np.empty(507)
 
 total_e = array('f', [ 0. ])
 firstlayer_e = array('f', [ 0. ])
@@ -116,8 +109,7 @@ for i in range(tin.GetEntries()):
     tin.GetEntry(i)
         
     y = "energy"
-    exec("%s = %s" % (y,"tin.cell_0"))
-    #print("cell initial energy is ",energy)
+    exec("%s = %s" % (y,"tin.cell_0")
     
     total_e = 0.
     firstlayer_e = 0.
@@ -135,7 +127,6 @@ for i in range(tin.GetEntries()):
         
     for j in range(504):
         exec("%s = %s" % (y,"tin.cell_"+str(j)))
-        #print("filled energy is ",energy)
         
         xbin = get_x(j,get_y(j,get_z(j)),get_z(j))
         ybin = get_y(j,get_z(j))
