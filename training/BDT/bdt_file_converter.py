@@ -1,5 +1,3 @@
-#converts file to format to be used by bdt
-
 from ROOT import *
 import numpy as np
 from array import array
@@ -52,7 +50,11 @@ def get_x(myindex,ybin,zbin):
     pass
 
 
-inname = "gamma_100GeV_20k.root"
+#def sendhelp(inname = "axion1_100GeV_20k.root", output_prefix = "new"):
+inname = "pi0_100GeV_20k.root" 
+#"electron_100GeV_19k.root"
+#"gamma_100GeV_20k.root"
+
 output_prefix = "new"
 treename = "fancy_tree"
 outname = output_prefix+"_"+inname
@@ -65,6 +67,12 @@ tout= TTree(treename,treename)
 sampling1 = TH2F("","",3,-240.,240.,480//5,-240.,240.)
 sampling2 = TH2F("","",480//40,-240.,240.,480//40,-240.,240.)
 sampling3 = TH2F("","",480//40,-240.,240.,480//80,-240.,240.)
+    
+#y = "energy"
+#exec("%s = %s" % (y,"tin.cell_0"))
+#print("initial energy is ",energy)
+
+#cells = np.empty(507)
 
 total_e = array('f', [ 0. ])
 firstlayer_e = array('f', [ 0. ])
@@ -109,18 +117,18 @@ for i in range(tin.GetEntries()):
     tin.GetEntry(i)
         
     y = "energy"
-    exec("%s = %s" % (y,"tin.cell_0")
+    exec("%s = %s" % (y,"tin.cell_0"))
     
-    total_e = 0.
-    firstlayer_e = 0.
-    secondlayer_e = 0.
-    thirdlayer_e = 0.
-    lateral_depth = 0.
-    lateral_depth2 = 0.
-    firstlayer_x = 0.
-    firstlayer_x2 = 0.
-    secondlayer_x = 0.
-    secondlayer_x2 = 0.
+    total_e[0] = 0.
+    firstlayer_e[0] = 0.
+    secondlayer_e[0] = 0.
+    thirdlayer_e[0] = 0.
+    lateral_depth[0] = 0.
+    lateral_depth2[0] = 0.
+    firstlayer_x[0] = 0.
+    firstlayer_x2[0] = 0.
+    secondlayer_x[0] = 0.
+    secondlayer_x2[0] = 0.
 
     if i%100 == 0:
         print(i,tin.GetEntries())
@@ -132,45 +140,47 @@ for i in range(tin.GetEntries()):
         ybin = get_y(j,get_z(j))
         zbin = get_z(j)
         
-        lateral_depth+= zbin*energy
-        lateral_depth2+= zbin*zbin*energy
+        lateral_depth[0] += zbin*energy
+        lateral_depth2[0] += zbin*zbin*energy
         yvalue = 0.;
         xvalue = 0.;
         
-        total_e += energy
+        total_e[0] += energy
         
         if (zbin==0):
-            firstlayer_e += energy
+            firstlayer_e[0] += energy
             sampling1.Fill(sampling1.GetXaxis().GetBinCenter(xbin+1),sampling1.GetYaxis().GetBinCenter(ybin+1),energy)
             xvalue = sampling1.GetXaxis().GetBinCenter(xbin+1)
             yvalue = sampling1.GetYaxis().GetBinCenter(ybin+1)
-            firstlayer_x += xvalue * energy
-            firstlayer_x2 += xvalue * xvalue * energy
+            firstlayer_x[0] += xvalue * energy
+            firstlayer_x2[0] += xvalue * xvalue * energy
             
         elif (zbin==1):
-            secondlayer_e += energy
+            secondlayer_e[0] += energy
             sampling2.Fill(sampling2.GetXaxis().GetBinCenter(xbin+1),sampling2.GetYaxis().GetBinCenter(ybin+1),energy)
             xvalue = sampling2.GetXaxis().GetBinCenter(xbin+1)
             yvalue = sampling2.GetYaxis().GetBinCenter(ybin+1)
-            secondlayer_x += xvalue * energy
-            secondlayer_x2 += xvalue * xvalue * energy
+            secondlayer_x[0] += xvalue * energy
+            secondlayer_x2[0] += xvalue * xvalue * energy
             
         elif (zbin == 2):
-            thirdlayer_e += energy
+            thirdlayer_e[0] += energy
             sampling3.Fill(sampling3.GetXaxis().GetBinCenter(xbin+1),sampling3.GetYaxis().GetBinCenter(ybin+1),energy)
             xvalue = sampling3.GetXaxis().GetBinCenter(xbin+1)
             yvalue = sampling3.GetYaxis().GetBinCenter(ybin+1)
         pass
-
-    frac_first=firstlayer_e/total_e
-    frac_second=secondlayer_e/total_e
-    frac_third=thirdlayer_e/total_e
-    shower_depth_gamma=lateral_depth/total_e
-    second_lateral_width_gamma = ((secondlayer_x2/secondlayer_e) - (secondlayer_x/secondlayer_e)**2)**0.5
-    first_lateral_width_gamma = (firstlayer_x2/firstlayer_e - (firstlayer_x/firstlayer_e)**2)**0.5
-    shower_depth_width_gamma = (lateral_depth2/total_e - (lateral_depth/total_e)**2)**0.5
+    
+    frac_first[0]=firstlayer_e[0]/total_e[0]
+    frac_second[0]=secondlayer_e[0]/total_e[0]
+    frac_third[0]=thirdlayer_e[0]/total_e[0]
+    shower_depth_gamma[0]=lateral_depth[0]/total_e[0]
+    second_lateral_width_gamma[0] = ((secondlayer_x2[0]/secondlayer_e[0]) - (secondlayer_x[0]/secondlayer_e[0])**2)**0.5
+    first_lateral_width_gamma[0] = (firstlayer_x2[0]/firstlayer_e[0] - (firstlayer_x[0]/firstlayer_e[0])**2)**0.5
+    shower_depth_width_gamma[0] = (lateral_depth2[0]/total_e[0] - (lateral_depth[0]/total_e[0])**2)**0.5
     tout.Fill()
     pass
+
+tout.Scan()
 
 tout.Write()
 fout.Close()
